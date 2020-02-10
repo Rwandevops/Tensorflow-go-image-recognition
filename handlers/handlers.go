@@ -56,7 +56,6 @@ var LoginUser = func(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&sent)
 	reponse := verif.LoginVerif(conn, sent)
 	println(reponse.Message)
-	reponse.Message = "login OK" // à virer quand le pb du password sera résolu
 	if reponse.Message == "login OK" {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(reponse.User)
@@ -96,6 +95,11 @@ var DeleteUser = func(w http.ResponseWriter, r *http.Request) {
 // Tensorflow fonction qui appelle Tensorflow
 var Tensorflow = func(w http.ResponseWriter, r *http.Request) {
 	imageLink := r.URL.Query().Get("imageLink")
-	result := tensorflow.TensorflowMain(imageLink)
-	json.NewEncoder(w).Encode(result)
+	testLink := imageLink[len(imageLink)-4:]
+	if testLink == ".jpg" || testLink == ".png" {
+		result := tensorflow.TensorflowMain(imageLink)
+		json.NewEncoder(w).Encode(result)
+	}
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode("Requête non valide")
 }
